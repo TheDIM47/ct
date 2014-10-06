@@ -1,0 +1,35 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = d2d.exe D2DGUI.exe D2DAXCtrl.ocx Dat2gdb.exe DV.exe datkitd6.bpl
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+d2d.exe: D2D\d2d.dpr
+  $(DCC)
+
+D2DGUI.exe: D2D_GUI\D2DGUI.dpr
+  $(DCC)
+
+D2DAXCtrl.ocx: D2D_OCX\D2DAXCtrl.dpr
+  $(DCC)
+
+Dat2gdb.exe: DAT2GDB\Dat2gdb.dpr
+  $(DCC)
+
+DV.exe: DV\DV.DPR
+  $(DCC)
+
+datkitd6.bpl: datkitd6.dpk
+  $(DCC)
+
+

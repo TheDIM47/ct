@@ -1,0 +1,61 @@
+                       CLARION TO DBF CONVERTER
+                  Copyright (C) by Dmitry Koudryavtsev
+                         GNU Public License v2
+
+  This demo-application based on Clarion 2.X Toolkit
+
+  You can use following keys in command line or configuration file
+    ( Core.D2D - sample configuration file )
+
+  -I<InboundDir> clarion database path
+
+  -O<OutboundDir> outbound path for dBASE tables
+
+  -R[+|-] repeatable opening on|off; 
+          wait while source or destination table locked
+
+  -D[+|-] DATE fields support on|off;
+          D2D will try to resolve DATE fields by field name
+          using DateContains and/or DateStarted properties.
+
+  -DS{str[;str]}
+          Holds strings, delimited by ";" which use for date resolution.
+          If field (of type LONG) name STARTS from any of present string,
+          this field will treat as DATE field.
+          Example: -DSDATE;DT
+
+  -DC{str[;str]} 
+          Holds strings, delimited by ";" which use for date resolution.
+          If field (of type LONG !) name CONTAINS any of present string,
+          this field will treat as DATE field.
+          Example: -DCDOW;DDT
+
+  -O[+|-] Strings, containing international characters will be 
+          converted using standard Windows procedure OemToCharBuff 
+          ( from DOS to current Windows locale )
+
+  -A[+|-] append mode on|off; 
+          append new data to existiong table
+          (default - target table will recreated)
+
+  -U[+|-] undelete mode on|off;
+          convert records marked as deleted in DAT
+
+  -W<Msec> waiting for next try to open source file; default INFINITE
+
+  -Y[+|-] array conversion mode on|off; 
+          will convert arrays to delimited string
+
+  -@<ParamFile> - file, that contains useful command line keys
+                  look at CORE.D2D for example
+
+  {files} files (tables) to convert
+
+
+Any comments and suggestions
+----------------------------
+Dmitry Koudryavtsev
+RUSSIA, Volgograd, 1999-2001
+Web:    http://juliasoft.chat.ru
+E-Mail: juliasoft@mail.ru
+FIDO:   2:5055/24

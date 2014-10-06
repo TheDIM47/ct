@@ -1,0 +1,21 @@
+                       CLARION 2.X TABLE VIEWER
+                  Copyright (C) by Dmitry Koudryavtsev
+                        GNU Public License v2
+
+  This demo-application based on Clarion 2.X Toolkit
+
+  Using: DV[.EXE] [File]
+
+  Features:
+  - Fast file load and moving, export to CSV
+  - Search mode
+  - Array field dimension contains in field name (ex. 'MY_FLD(10)')
+  - Array field values will appear after doubleclick as string,
+      delimited by ";" char
+
+Any comments and suggestions
+----------------------------
+Dmitry Koudryavtsev
+RUSSIA, Volgograd, 1999-2002
+Web:    http://juliasoft.chat.ru
+E-Mail: juliasoft@mail.ru

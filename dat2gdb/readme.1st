@@ -1,0 +1,154 @@
+                     Clarion to INTERBASE converter
+                  Copyright (C) by Dmitry Kudryavtsev
+                       GNU Public License v2
+
+  Based on Clarion 2.X Toolkit and IBX (D5, D6)
+
+  Features:
+  - Multi-databases support
+  - Smart array to VARCHAR conversion
+  - Field "aliasing"
+  - Advanced DATE and TIME resolving 
+  - Fast incremental mode
+  - Open sources
+
+  1. Edit and run createdb.sql from IB Interactive SQL for create
+     your SQL Database.
+  2. Edit example DAT2GDB.CNF file or make your own
+  3. Run DAT2GDB <Config_File>
+  4. Check for errors and return to step 2.
+
+  This application append following fields to each table
+  ------------------------------------------------------
+
+  Field   Type       Comment
+  -----   --------   -------------------------------------------
+  ID      INTEGER  - 0 or "Super_Gen" Value
+                     (see below)
+                     Super_Gen - IB Generator created by
+                                 createdb.sql script
+
+  OWNER   INTEGER  - always 0
+
+  UPDATED DATE     - Now();
+  USERID  CHAR(8)  - always 'DAT2GDB'
+
+  OFFID   SMALLINT - Office ID
+  CDBID   SMALLINT - Database ID - you can set both values
+                                   to 0 or any other number
+
+
+  Fields conversion
+  -----------------
+
+    Clarion        Interbase
+    -------        ---------
+    Array          Varchar(xxx) with ";" as delimeter
+                   or empty Varchar(1) if ArrayAsStr=No
+    Decimal(x,y)   Decimal(x,y)
+    Real           Double Precision
+    Byte/Short     SmallInt
+    Long           Integer
+    String/Picture Varchar
+
+
+  Incremental mode
+  ----------------
+
+    Based on record number in Clarion Table.
+
+    - read incremental information (number of last imported record)
+      from incinfo.bin (or 0 if none)
+    - go to next record (or Bof)
+    - convert record until Eof
+    - store incremental information in incinfo.bin
+
+    Incremental information updates automatically. See IncInfo.Pas
+      for details.
+
+=========================================================================
+Sample configuration Dat2Gdb.Cnf
+=========================================================================
+
+Common parameters
+-----------------
+
+DBName      = volcano.sia.ru:/opt/ib_data/ibabc.gdb 
+                         - Interbase SQL Database
+
+User        = SYSDBA     - User name
+
+Password    = masterkey  - Password. If password not defined,
+                           Login Dialog appears.
+
+Collation   = WIN1251    - Collation
+
+UseSuperGen = Yes        - Use SUPER_GEN (see. CREATEDB.SQL) for
+                           unique record ID creating, else - 0
+
+CommitAfter = 1000       - Commit after N - records
+                           0 - Commit for each record (very slow mode)
+
+Undelete    = No         - Convert records marked as "deleted"
+                           in Clarion Table
+
+ArrayAsStr  = Yes        - Convert array to string VARCHAR(xxx)
+                           otherwise empty string VARCHAR(1) (for speed)
+
+WaitFor     = 1000       - Wait for the next try to open source file
+                           default: INFINITE
+
+DateSupport  = Yes       - Use DateStarted and DateContains properties
+DateStarted  = DOW         for DATE field resolving in Clarion Tables
+DateContains = DT;DATE
+
+TimeSupport  = Yes       - Use TimeStarted and TimeContains properties
+TimeStarted  = TT          for TIME field resolving in Clarion Tables
+TimeContains = TIME
+
+See also options.txt 
+
+Field "aliasing"
+----------------
+
+FIELD=<OLD FIELD NAME WITH TABLE PREFIX>;<NEW NAME>;
+
+FIELD=ACC:DATE0;  DATE00;
+FIELD=LST:DATE;   DATE01;
+FIELD=MED:MIN;    MMIN;
+
+For example, because 'DATE' is reserved Interbase Word, we can't create
+IB field named as 'DATE'. Using field "aiasing" we can replace field
+name during conversion.
+
+Clarion database definition
+---------------------------
+CDB=<OFFICE ID>;<CLARION DATABASE ID>;<INCREMENTAL MODE>;<DATA PATH>;{<TABLES>};
+       (1)               (2)                 (3)            (4)         (5)
+
+  1 - Your office ID, or 0, or any number
+
+  2 - Your Database ID, or 0, or any number
+
+  3 - Use Incremental Mode ?
+
+  4 - Path to Clarion Database
+
+  5 - Tables to convert
+
+
+CDB = 5; 01; No;  T:\ABC\DB01\DATA\;  ACC; LST; REF;
+. . .
+
+CDB = 5; 10; No;  T:\ABC\DB10\DATA\;  ACC; LST; REF;
+. . .
+
+CDB = 5; 99; Yes; T:\ABC\DB99\DATA\;  ACC; LST; REF; USR; FEX; MED; REG;
+
+=========================================================================
+Any comments and suggestions are welcome
+----------------------------------------
+Dmitry Koudryavtsev
+RUSSIA, Volgograd, 1999-2002
+Web:    http://juliasoft.chat.ru
+E-Mail: juliasoft@mail.ru

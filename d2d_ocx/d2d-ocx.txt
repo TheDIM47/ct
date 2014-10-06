@@ -1,0 +1,31 @@
+D2DAXCtrl
+=========
+
+   D2DAXCtrl (DAX) is well known Clarion Dat to Dbf converter (D2D)
+http://juliasoft.chat.ru/clarion.html modified for use as ActiveX
+component inside your application. 
+
+Methods
+=======
+
+  Go(SourceFile, DestinationFile)
+    SourceFile - path and name of Clarion DAT file (example: "C:\myfile.dat")
+    DestinationFile - path and name of target dBASE file ("C:\myfile.dbf")
+
+Properties
+==========
+  See Options.txt
+
+
+See also
+========
+  Clarion Toolkit Dat To Dbf converter D2D sources and readme.
+  You can download free ( GNU public license http://www.gnu.org ) 
+  Clarion Toolkit sources and binaries from homepage.
+
+
+Copyright (C) by Dmitry Koudryavtsev
+------------------------------------
+RUSSIA, Volgograd, 2002
+Homepage: http://juliasoft.chat.ru
+E-mail: juliasoft@mail.ru

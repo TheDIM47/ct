@@ -1,0 +1,96 @@
+#
+# CLARION TO INTERBASE GDB CONVERTER
+# Sample configuration file
+# Copyright (C) by Dmitry Koudryavtsev
+#
+;------------------------------------------------------
+; Target Interbase Database
+;
+DBName = volcano.sia.ru:/opt/ib_data/ibabc.gdb
+;
+;------------------------------------------------------
+; UserID
+;
+User = SYSDBA
+;
+;------------------------------------------------------
+; Password (for autologin)
+;
+Password = masterkey
+;
+;------------------------------------------------------
+; Database collation and locale conversion for linux
+;
+Collation = WIN1251
+;
+;
+SourceLocale = CP866
+TargetLocale = WINDOWS-1251
+;
+;------------------------------------------------------
+; Use Unique ID generator (SUPER_GEN)
+;
+UseSuperGen = Yes
+;
+;------------------------------------------------------
+; Commit After N records: 1..N
+;
+CommitAfter = 1000
+;
+;------------------------------------------------------
+; "Undelete" records marked as "Deleted" in DAT
+;
+Undelete = No
+;
+;------------------------------------------------------
+; "WaitFor" - Wait for the next try to open source file
+;             in 'msec'
+;
+WaitFor = 10
+;
+;------------------------------------------------------
+; "ArrayAsStr" - array will be converted to string,
+;   delimited by ';'
+;
+ArrayAsStr = No
+;
+;------------------------------------------------------
+; "DateSupport" - Support DATE resolution algorythm
+; "TimeSupport" - Support TIME resolution algorythm
+;
+DateSupport = Yes
+DateStarted = DT
+DateContains = DATE
+;
+TimeSupport = Yes
+TimeStarted = TM
+TimeContains = TIME
+;
+;------------------------------------------------------
+; Field "aliasing"
+;
+; FIELD=<OLD FIELD NAME>;<NEW NAME>;
+;
+FIELD=ACC:DATE0;    DATE00;
+FIELD=ACC:DATE;     DATE01;
+FIELD=ACC:TIME;     "TIME";
+FIELD=LST:DATE;     DATE01;
+FIELD=MED:MIN;      MMIN;
+FIELD=MED:MAX;      MMAX;
+FIELD=MED:WAIT;     MWAIT;
+FIELD=REG:SELECT;   RSELECT;
+FIELD=ECW:ACTION;   RUNACTION;
+FIELD=PT:ID;        PTID;
+FIELD=PT:GROUP;     PTGROUP;
+FIELD=PT:PLAN;      PTPLAN;
+;FIELD=USR:CURRENCY; UCURR;
+;
+;------------------------------------------------------
+; Clarion Databases
+;
+; CDb=<OFFICE ID>;<DATABASE ID>;<INCREMENTAL>;<DATA PATH>;{<TABLES>};
+;
+CDb = 1; 1; No; /home/dim/dat; USR; ACC; LST; REF; REG;   
+;
+
+

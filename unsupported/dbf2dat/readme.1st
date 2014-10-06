@@ -1,0 +1,35 @@
+                   dBASE DBF TO CLARION DAT CONVERTER
+                  Copyright (C) by Dmitry Koudryavtsev
+                       Under GNU Public License
+
+  This demo-application based on modified sources of 
+  Clarion 2.X Toolkit v1.05
+
+  Features:
+  - Encryption support
+  - Clarion arrays support (String to Array conversion)
+  - Full source code
+
+  Usage:
+  DBF2DAT <Source.DBF> <Template.DAT> <DestFile.Dat>
+
+    Source.DBF   - source file for conversion
+    Template.DAT - template file for creating destination
+                   table header, field types and keys
+    DestFile.DAT - name of the target file
+                   if file already exists, it will be overwrited
+
+  If destination file should contains arrays, your source (DAT) file 
+  should be converted with D2D v1.12 or later, using -Y+ switch.
+
+  For encrypted files password will be get from template table.
+
+  Note! Don't use same template and destination file names
+
+Any comments and suggestions
+----------------------------
+Dmitry Koudryavtsev
+RUSSIA, Volgograd, 1999-2001
+Web:    http://juliasoft.chat.ru
+E-Mail: juliasoft@mail.ru
+FIDO:   2:5055/24

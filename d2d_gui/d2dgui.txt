@@ -1,0 +1,32 @@
+D2D GUI Edition
+===============
+
+   D2D GUI Edition is well known Clarion Dat to dBASE III Dbf converter 
+(D2D) http://juliasoft.chat.ru/clarion.html modified to be GUI application. 
+   D2D GUI shares 100% core code with D2D OCX edition.
+
+   D2D GUI application is freeware.
+
+Methods
+=======
+
+  Go(SourceFile, DestinationFile)
+    SourceFile - path and name of Clarion DAT file (example: "C:\myfile.dat")
+    DestinationFile - path and name of target dBASE file ("C:\myfile.dbf")
+
+Properties
+==========
+  See Options.txt
+
+See also
+========
+  For more information see Clarion Toolkit Dat To Dbf converter 
+  (D2D console) sources and readme. You can download free Clarion 
+  Toolkit sources and binaries from homepage.
+
+
+Copyright (C) by Dmitry Koudryavtsev
+------------------------------------
+RUSSIA, Volgograd, 2002
+Homepage: http://juliasoft.chat.ru
+E-mail: juliasoft@mail.ru

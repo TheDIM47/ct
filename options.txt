@@ -1,0 +1,79 @@
+Properties
+==========
+
+  Repeatable - boolean 
+  ----------
+    If source or destination file locked for reading/writing by another
+    application, D2D will try to reopen file after "MsecWait" milliseconds
+    or after the OS event occurs. 
+
+  MsecWait - long integer
+  --------
+    Wait for "MsecWait" milliseconds and make next try to open locked file.
+    (See MSDN WaitForSingleObject function for details)
+
+  DateSupport - boolean 
+  -----------
+    The Clarion 2.X DAT table does not contains real DATE type.
+    Instead, dates and times stored in fields of type LONG.
+
+    D2D will try to resolve DATE fields by field name
+    using DateContains and/or DateStarted properties.
+
+    This string properties should contains strings delimited by ";"
+
+    For example, if DateContains property is "DATE;DOF" then fields of
+    type LONG with field names _containing_ substring "DATE" or "DOF"
+    ( for example "ACC:EXP_DATE" ) will be treat as DATE field.
+
+    For DateStarted property, fields of type LONG with field names
+    _beginning_ with required substring will be treat as DATE field.
+
+    Values of DateStarted property processed before DateContains values.
+
+  DateContains - string 
+  ------------
+    Holds strings, delimited by ";" which use for date resolution.
+    If field (of type LONG !) name _contains_ any of present string,
+    this field will treat as DATE field.
+
+  DateStarted - string 
+  -----------
+    Holds strings, delimited by ";" which use for date resolution.
+    If field (of type LONG) name _starts_ from any of present string,
+    this field will treat as DATE field.
+
+    Note 1: field prefix excluded from clarion field names;
+
+    Note 2: You can easy convert Clarion date to windows date using
+            simple algorythm:
+                              WindowsDate := ClarionDate - 36161;
+
+    Note 3: If you set DateSupport to True, you should also set
+            DateStarted and/or DateContains property;
+
+  AppendMode - boolean 
+  ----------
+    If destination table exists, converted records will be appended,
+    overwhise new table will be created.
+
+    Note: Be careful in shared environment !
+
+  UnDelMode - boolean 
+  ---------
+    If True, Clarion records marked as deleted in Clarion table 
+    will be "undeleted" and converted to destination dBase file.
+
+  ArraySupport - boolean 
+  ------------
+    Clarion array fields will be converted to dBASE string (!),
+    delimited by ";" char. String length calculated using
+    adaptive algorythm. If "ArraySupport" false, only the first
+    array elementh (<array>[1]) will be converted using appropriate
+    field type.
+
+  OemConvert - Boolean 
+  ----------
+    Strings, containing international characters will be converted
+    using standard Windows procedure OemToCharBuff (from DOS to
+    current Windows locale)

@@ -1,0 +1,30 @@
+                        CLARION TOOLKIT AGE II
+                           TClarionDataSet
+                  Copyright (C) by Dmitry Kudryavtsev
+                       Under GNU Public License
+
+  TClarionDataSet - TDataSet descendant component with read
+                    and write access to Clarion v2.X tables.
+                    Memo fields support.
+                    No Clarion Arrays and Indexes (yet :-)...
+
+TClarionDataSet based on VCL's TDataSet an Clarion Toolkit v1.X.
+This package was initially developed on Delphi 5, but I think it will run
+on other Delphi or C++Builder versions without (or with small) changes.
+
+News for v0.91
+--------------
+  + Memo fields writing
+  + BlobToCache property
+  * bugfix
+
+Version 0.90
+------------
+  First public beta. Open Source release.
+
+Any comments and suggestions
+----------------------------
+Dmitry Kudryavtsev
+RUSSIA, Volgograd, 2000
+E-Mail: juliasoft@mail.ru
+FIDO:   2:5055/24
