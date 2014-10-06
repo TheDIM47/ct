@@ -1,7 +1,7 @@
-                     CLARION TOOLKIT VERSION 1.14
-		     ============================
-                  Copyright (C) by Dmitry Koudryavtsev
-                        GNU Public License v2
+CLARION TOOLKIT VERSION 1.14
+----------------------------
+Copyright (C) by Dmitry Koudryavtsev
+GNU Public License v2
 
   Clarion 2.X Toolkit - Delphi components and demo-applications
                         for Clarion v.2.X tables read-only access.
