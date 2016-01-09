@@ -27,6 +27,8 @@ GNU Public License v2
           "Error reading XXXX. Invalid property value....."
           - ignore it (press "Ignore all"). 
 
+  You can find precompiled Win32 binaries in "binaries" folder.
+
   Packaging:
 
   d2d         - Demo - Clarion to dBASE DBF converter (D2D) console
