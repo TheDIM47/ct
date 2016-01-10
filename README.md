@@ -1,4 +1,4 @@
-CLARION TOOLKIT VERSION 1.14
+CLARION TOOLKIT VERSION 1.16
 ----------------------------
 Copyright (C) by Dmitry Koudryavtsev
 GNU Public License v2
@@ -51,6 +51,36 @@ GNU Public License v2
    gpl.rus.html - License file ( russian )
    readme.1st   - This file
 
+  News for 1.16 (Feb-2003)
+  ! New decryption algorythms  
+  * Minor bugfix. Minor changes in exception handling 
+  ! Now, default value for Repeatable option is FALSE (!) (d2dx)
+  + New Dat2Gdb key DeleteOld (see dat2gdb/readme.1st for details)
+    (useful for empty gdb (with metadata only, for example))
+
+  News for 1.15.4 (Oct-2002)
+  * Minor bugfix 
+  + New D2D key -E{O|C|-} OemToChar|CharToOem|None conversion
+    for international users
+  ! OemConvert option changed from Boolean to TOemCvtType 
+  + datkitd7.dpk - Delphi 7 package
+
+  News for 1.15.3 (Aug-2002)
+  * dat2gdb bugfix (fix problem with BYTE fields)
+
+  News for 1.15.2 (Aug-2002)
+  * dat2gdb bugfix 
+
+  News for 1.15 (Jul-2002)
+  ! Juliasoft's homepage has been moved !!!
+    Our new location is http://juliasoft.nm.ru
+  * more linux compatibility, minor optimization, minor code changes
+  ! if you want to built D2D ActiveX, enable D2D_OCX option in d2d.inc 
+  * Hint: you can enable TIME_SLICE in dat2gdb\dat2gdb.inc for use dat2gdb 
+    on non-NT based OS.
+  ! use dat2gdb\threaded_timer\ThreadedTimer.pas and "IBX without QT Timer"
+    edition (See Jeff Overcash submission on Borland Code Central) for 
+    compile dat2gdb without Qt (linux compile).
 
   News for 1.14 (Aug-2001 - Jul-2002)
   + Clarion Toolkit ported to Linux !
