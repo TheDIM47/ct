@@ -9,24 +9,24 @@ MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
 DCC = $(ROOT)\bin\dcc32.exe $**
 BRCC = $(ROOT)\bin\brcc32.exe $**
 #------------------------------------------------------------------------------
-PROJECTS = d2d.exe D2DGUI.exe D2DAXCtrl.ocx Dat2gdb.exe DV.exe datkitd6.bpl
+PROJECTS = datkitd6.bpl d2d.exe d2dgui.exe dat2gdb.exe dv.exe d2daxctrl.ocx
 #------------------------------------------------------------------------------
 default: $(PROJECTS)
 #------------------------------------------------------------------------------
 
-d2d.exe: D2D\d2d.dpr
+d2d.exe: d2d\d2d.dpr
   $(DCC)
 
-D2DGUI.exe: D2D_GUI\D2DGUI.dpr
+d2dgui.exe: d2d_gui\d2dgui.dpr
   $(DCC)
 
-D2DAXCtrl.ocx: D2D_OCX\D2DAXCtrl.dpr
+d2daxctrl.ocx: d2d_ocx\d2daxctrl.dpr
   $(DCC)
 
-Dat2gdb.exe: DAT2GDB\Dat2gdb.dpr
+dat2gdb.exe: dat2gdb\dat2gdb.dpr
   $(DCC)
 
-DV.exe: DV\DV.DPR
+dv.exe: dv\dv.dpr
   $(DCC)
 
 datkitd6.bpl: datkitd6.dpk

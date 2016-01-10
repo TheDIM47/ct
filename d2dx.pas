@@ -1,7 +1,7 @@
 (*
 ** Clarion DAT table to dBASE DBF ActiveX converter
 ** Copyright (C) by Dmitry Koudryavtsev
-** http://juliasoft.chat.ru
+** http://juliasoft.nm.ru
 ** juliasoft@mail.ru
 *)
 unit d2dx;
@@ -11,17 +11,15 @@ interface
 {$INCLUDE d2dx.inc}
 
 uses
-{$IFDEF LINUX}
-  QControls,
-{$ELSE}
+{$IFDEF WIN32}
   Windows,
   Controls,
 {$ENDIF}
   SysUtils, Classes, clarion, cldb, ctdbf
 {$IFDEF VER140}
-{$IFDEF USE_VARIANT}
-  ,Variants
-{$ENDIF}
+  {$IFDEF USE_VARIANT}
+    ,Variants
+  {$ENDIF}
 {$ENDIF}
 ;
 
@@ -35,8 +33,19 @@ const
 
 type
   TFieldNoSet = set of Byte;
+  TOemCvtType = ( ocOemToChar, ocCharToOem, ocNone );
 
-  TD2DX = class(TWinControl)
+  TD2DX = class(
+          {$IFDEF WIN32}
+	    {$IFDEF D2D_OCX}
+              TWinControl
+	    {$ELSE}
+              TObject
+	    {$ENDIF}
+	  {$ELSE}
+	    TObject
+	  {$ENDIF}
+	  )
    private
     FRepeatable : Boolean;
     FDateSupport : Boolean;
@@ -46,7 +55,7 @@ type
     FAppendMode : Boolean;
     FUnDelMode : Boolean;
     FArraySupport : Boolean;
-    FOemConvert : Boolean;
+    FOemConvert : TOemCvtType;
     FMsecWait : Longint; // INFINITE;
     //
     FDateContains, FDateStarted : TStringList;
@@ -72,7 +81,15 @@ type
     function IsTimeField(Value : String) : Boolean;
     {$ENDIF}
    public
-    constructor Create(AOwner : TComponent); override;
+    {$IFDEF WIN32}
+      {$IFDEF D2D_OCX}
+        constructor Create(AOwner : TComponent); override;
+      {$ELSE}
+        constructor Create;
+      {$ENDIF}
+    {$ELSE}
+      constructor Create;
+    {$ENDIF}
     destructor Destroy; override;
     procedure Go(InFile, OutFile : String);
     //
@@ -81,7 +98,8 @@ type
     property UnDelMode    : Boolean read FUnDelMode write FUnDelMode;
     property MsecWait     : Longint read FMsecWait write FMsecWait;
     property ArraySupport : Boolean read FArraySupport write FArraySupport;
-    property OemConvert   : Boolean read FOemConvert write FOemConvert;
+    // 1.15.4
+    property OemConvert   : TOemCvtType read FOemConvert write FOemConvert;
     //
     property DateSupport  : Boolean read FDateSupport write FDateSupport;
     property DateContains : String read GetDateContains write SetDateContains;
@@ -94,20 +112,32 @@ type
     {$ENDIF}
   end;
 
+{$IFDEF D2D_OCX}
 procedure Register;
+{$ENDIF}
 
 implementation
 
+{$IFDEF D2D_OCX}
 procedure Register;
 begin
   RegisterComponents('Data Access', [TD2DX]);
 end;
+{$ENDIF}
 
-constructor TD2DX.Create(AOwner : TComponent);
+{$IFDEF WIN32}
+  {$IFDEF D2D_OCX}
+    constructor TD2DX.Create(AOwner : TComponent);
+  {$ELSE}
+    constructor TD2DX.Create;
+  {$ENDIF}
+{$ELSE}
+  constructor TD2DX.Create;
+{$ENDIF}
 begin
-  Inherited Create(AOwner);
+  Inherited; // Create(AOwner);
 // init variables
-  FRepeatable := True;
+  FRepeatable := False;
 {$IFDEF D2D_DEFAULTS}
   FAppendMode  := False;
   FArraySupport := False;
@@ -119,7 +149,7 @@ begin
 {$ENDIF}
   FUnDelMode := False;
   FMsecWait := DIM_INFINITE;
-  FOemConvert := False;
+  FOemConvert := ocNone;
 //
   FDateContains := TStringList.Create;
   FDateStarted := TStringList.Create;
@@ -172,9 +202,10 @@ begin
       i := Pos(';', S);
       if i > 0 then begin
         FDateContains.Add(Copy(S, 1, i-1));
-        Delete(S, 1, i);
-      end else
+        System.Delete(S, 1, i);
+      end else begin
         FDateContains.Add(S);
+      end;
     until i = 0;
   end;
 end;
@@ -190,9 +221,10 @@ begin
       i := Pos(';', S);
       if i > 0 then begin
         FDateStarted.Add(Copy(S, 1, i-1));
-        Delete(S, 1, i);
-      end else
+        System.Delete(S, 1, i);
+      end else begin
         FDateStarted.Add(S);
+      end;
     until i = 0;
   end;
 end;
@@ -204,7 +236,8 @@ begin
   if FDateContains.Count > 0 then begin
     for i := 0 to FDateContains.Count - 1 do
       Result := Result + FDateContains[i] + ';';
-    SetLength(Result, Length(Result) - 1);
+//    SetLength(Result, Length(Result) - 1);
+//    Result := Copy(Result, 1, Length(Result) - 1);
   end;
 end;
 
@@ -215,7 +248,8 @@ begin
   if FDateStarted.Count > 0 then begin
     for i := 0 to FDateStarted.Count - 1 do
       Result := Result + FDateStarted[i] + ';';
-    SetLength(Result, Length(Result) - 1);
+//    SetLength(Result, Length(Result) - 1);
+//    Result := Copy(Result, 1, Length(Result) - 1);
   end;
 end;
 
@@ -316,7 +350,7 @@ Var
    lc : Longint;
 FldNo : Byte;
     p : PChar; // v.1.11
-    S : String;
+//    S : String;
 Handle : Longint;
 NumOfCvt : LongInt;
 // v.1.11
@@ -325,11 +359,18 @@ Year, Month, Day : Word;
 c : Char;
 aFldLen : Integer;
 // v.1.10
-WVer : Longint;
+//WVer : Longint;
 //
 {$H+}PS : String;{$H-}
 begin
+  // 1.15.3
+  for i := 0 to 255 do FieldFormats[i] := '';
+  FDateFields := [];
+  FTimeFields := [];
+
   db := TctClarion.Create(nil);
+  db.Read_Only := True;
+  db.Exclusive := False;  
   db.FileName := InFile;
 
   ep := True;
@@ -339,31 +380,36 @@ begin
       try
         db.Open;
       except
-        if ep then begin
-          ep := False;
-        end;
-      {$IFDEF LINUX}
-        Sleep(FMsecWait);
-      {$ELSE}
-        err := 1;
-        Handle := FindFirstChangeNotification( PChar(@OutFile[1]), False, FILE_NOTIFY_CHANGE_FILE_NAME );
-//--- Handle should be SYNCHRONYZE access on WinNT  // v.1.10
-//--- Code below is just a fast workaround
-//        WVer := Windows.GetVersion;
-        if (Windows.GetVersion < $80000000) AND (FMSecWait = High(Longint)) then FMSecWait := 1000;
-//---
-        WaitForSingleObject( Handle, FMsecWait );
-        FindCloseChangeNotification( Handle );
-      {$ENDIF}
-      end;
+        on E : Exception do begin
+          if (E.Message = ERR_CT_STRANGE_ENCRYPT) (*or (E.Message = ERR_CT_INVALID_VERSION)*) then
+            raise
+          else begin
+            if ep then
+              ep := False;
+          {$IFDEF LINUX}
+            Sleep(FMsecWait);
+          {$ELSE}
+            err := 1;
+            Handle := FindFirstChangeNotification( PChar(@OutFile[1]), False, FILE_NOTIFY_CHANGE_FILE_NAME );
+    //--- Handle should be SYNCHRONYZE access on WinNT  // v.1.10
+    //--- Code below is just a fast workaround
+    //        WVer := Windows.GetVersion;
+            if (Windows.GetVersion < $80000000) AND (FMSecWait = High(Longint)) then FMSecWait := 1000;
+    //---
+            WaitForSingleObject( Handle, FMsecWait );
+            FindCloseChangeNotification( Handle );
+          {$ENDIF}
+          end;
+        end; // on E
+      end; // try
     until (err = 0);
   end else
-    try
+//    try
       db.Open;
-    except
-      raise Exception.Create(' ERROR: Cant open file');
-      exit;
-    end;
+//    except
+//      on E : Exception do WriteLn(' ERROR: Can''''t open file. ', E.Message);
+//      raise;
+//    end;
 
   db2 := TdBASE.Create;
   db2.FileName := OutFile;
@@ -573,8 +619,7 @@ begin
                 buf[db2.Fields[FldNo].GetFieldOffset + 5] := '0';
               if buf[db2.Fields[FldNo].GetFieldOffset + 7] = ' ' then
                 buf[db2.Fields[FldNo].GetFieldOffset + 7] := '0';
-            end else
-            begin
+            end else begin
               try
               FormatBuf( buf[db2.Fields[FldNo].GetFieldOffset],
                          db2.Fields[FldNo].GetFieldLen + 1,
@@ -593,9 +638,12 @@ begin
           begin
             p := cur.GetRawDataPointer(db.Fields[i]);
             {$IFDEF WIN32}
-            if FOemConvert then
+            if FOemConvert = ocCharToOem then
+              CharToOemBuff(p, p, db.Fields[i].GetFieldSize)
+            else
+            if FOemConvert = ocOemToChar then
               OemToCharBuff(p, p, db.Fields[i].GetFieldSize);
-            {$ENDIF}  
+            {$ENDIF}
             Move(p[0], buf[db2.Fields[FldNo].GetFieldOffset+1], db.Fields[i].GetFieldSize);
             Inc(FldNo);
           end;

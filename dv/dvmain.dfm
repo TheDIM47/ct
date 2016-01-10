@@ -1,6 +1,6 @@
 object DvForm: TDvForm
-  Left = 216
-  Top = 221
+  Left = 414
+  Top = 162
   Width = 484
   Height = 291
   HorzScrollBar.Range = 369
@@ -8,18 +8,20 @@ object DvForm: TDvForm
   ActiveControl = Grid
   AutoScroll = False
   Caption = 'Clarion 2.1 DAT Viewer'
-  Color = clButton
-  Font.Color = clText
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
   Font.Height = 11
   Font.Name = 'MS Sans Serif'
   Font.Pitch = fpVariable
   Font.Style = []
   Menu = MainMenu1
-  ParentFont = False
+  OldCreateOrder = True
   Scaled = False
   OnActivate = FormActivate
   OnCreate = FormCreate
-  PixelsPerInch = 75
+  PixelsPerInch = 96
+  TextHeight = 13
   object Grid: TDrawGrid
     Left = 8
     Top = 8
@@ -29,7 +31,8 @@ object DvForm: TDvForm
     DefaultColWidth = 60
     DefaultRowHeight = 18
     RowCount = 2
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 11
     Font.Name = 'MS Sans Serif'
     Font.Pitch = fpVariable
@@ -99,11 +102,14 @@ object DvForm: TDvForm
     end
   end
   object FontDialog1: TFontDialog
+    Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = 13
     Font.Name = 'Helvetica'
     Font.Pitch = fpVariable
     Font.Style = []
+    MinFontSize = 0
+    MaxFontSize = 0
     Left = 80
     Top = 80
   end

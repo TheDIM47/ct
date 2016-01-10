@@ -2,9 +2,7 @@ library D2DAXCtrl;
 
 uses
   ComServ,
-  D2DAXCtrl_TLB in 'D2DAXCtrl_TLB.pas',
-  D2DA in 'D2DA.pas' {D2DAX: CoClass},
-  About in 'About.pas' {D2DAXAboutBox};
+  D2DAXCtrl_TLB in 'D2DAXCtrl_TLB.pas';
 
 {$E ocx}
 

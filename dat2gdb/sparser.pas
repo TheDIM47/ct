@@ -29,6 +29,7 @@ type
     KEY_WAITFOR,
     KEY_FROM_LOCALE,
     KEY_DEST_LOCALE,    KEY_ARR2STR,
+    KEY_DELETE_OLD,
     KEY_DATE_SUPPORT,
     KEY_DATE_STARTED,
     KEY_DATE_CONTAINS,
@@ -45,7 +46,7 @@ type
   end;
 
 const
-  MAX_KEY = 19;
+  MAX_KEY = 20;
   KeyWords : array[1..MAX_KEY] of TKeyWord = (
     ( KeySign : KEY_DBNAME   ; KeyWord : 'DBName'      ),
     ( KeySign : KEY_USER     ; KeyWord : 'User'        ),
@@ -58,6 +59,7 @@ const
     ( KeySign : KEY_WAITFOR  ; KeyWord : 'WaitFor'     ),
     ( KeySign : KEY_FROM_LOCALE ; KeyWord : 'SourceLocale' ),
     ( KeySign : KEY_DEST_LOCALE ; KeyWord : 'TargetLocale' ),    ( KeySign : KEY_ARR2STR  ; KeyWord : 'ArrayAsStr'  ),
+    ( KeySign : KEY_DELETE_OLD ; KeyWord : 'DeleteOld'  ),
     ( KeySign : KEY_DATE_SUPPORT  ; KeyWord : 'DateSupport'  ),
     ( KeySign : KEY_DATE_STARTED  ; KeyWord : 'DateStarted'  ),
     ( KeySign : KEY_DATE_CONTAINS ; KeyWord : 'DateContains' ),
@@ -122,9 +124,11 @@ const
   ArrayAsStr  : Boolean = False;
   DateSupport : Boolean = False;
   TimeSupport : Boolean = False;
-  MsecWait    : LongWord = {$IFDEF WIN32}INFINITE{$ELSE}10000{$ENDIF};
+  DeleteOld   : Boolean = True;
+  MsecWait    : LongWord = {$IFDEF WIN32}INFINITE{$ELSE}1000{$ENDIF};
   SourceLocale : String = 'ASCII';
   TargetLocale : String = 'ASCII';
+
 IMPLEMENTATION
 
 // Internal Functions
@@ -197,8 +201,9 @@ begin
         Case GetKeySign(sKey) of
           KEY_DBNAME  : DatabaseName := sVal;
           KEY_USER    : Params.Add('isc_dpb_user_name=' + sVal);
-          KEY_SUPERGEN: UseSuperGen := YesNoToBool(sVal);
-          KEY_COMAFTER: CommitAfter := StrToInt(sVal);
+          KEY_SUPERGEN : UseSuperGen := YesNoToBool(sVal);
+          KEY_COMAFTER : CommitAfter := StrToInt(sVal);
+          KEY_DELETE_OLD : DeleteOld := YesNoToBool(sVal);
 
           KEY_FROM_LOCALE : SourceLocale := Trim(sVal) + #0;
           KEY_DEST_LOCALE : TargetLocale := Trim(sVal) + #0;

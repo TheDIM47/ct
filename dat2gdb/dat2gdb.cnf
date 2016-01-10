@@ -6,7 +6,7 @@
 ;------------------------------------------------------
 ; Target Interbase Database
 ;
-DBName = volcano.sia.ru:/opt/ib_data/ibabc.gdb
+DBName = /opt/interbase/ibabc.gdb
 ;
 ;------------------------------------------------------
 ; UserID
@@ -35,7 +35,7 @@ UseSuperGen = Yes
 ;------------------------------------------------------
 ; Commit After N records: 1..N
 ;
-CommitAfter = 1000
+CommitAfter = 20000
 ;
 ;------------------------------------------------------
 ; "Undelete" records marked as "Deleted" in DAT
@@ -55,15 +55,21 @@ WaitFor = 10
 ArrayAsStr = No
 ;
 ;------------------------------------------------------
+; "DeleteOld" - delete old records before conversion
+;   (useful for empty databases)
+;
+DeleteOld = Yes
+;
+;------------------------------------------------------
 ; "DateSupport" - Support DATE resolution algorythm
 ; "TimeSupport" - Support TIME resolution algorythm
 ;
 DateSupport = Yes
-DateStarted = DT
+;DateStarted = DOW
 DateContains = DATE
 ;
 TimeSupport = Yes
-TimeStarted = TM
+;TimeStarted = TM
 TimeContains = TIME
 ;
 ;------------------------------------------------------
@@ -90,7 +96,16 @@ FIELD=PT:PLAN;      PTPLAN;
 ;
 ; CDb=<OFFICE ID>;<DATABASE ID>;<INCREMENTAL>;<DATA PATH>;{<TABLES>};
 ;
-CDb = 1; 1; No; /home/dim/dat; USR; ACC; LST; REF; REG;   
+; Linux version
+;CDb = 1; 40; No; /mnt/diskj/ltd/40; USR.DAT;
 ;
-
-
+; Win32 version
+;CDb = 1; 10; No; j:\10; acc; lst; med; fex; reg; ref; usr;
+;CDb = 1; 10; No; /mnt/disk/ltd/10; ACC.DAT; USR.DAT; LST.DAT; MED.DAT;
+CDb = 1; 50; No; /mnt/disk/ltd/50; MED.DAT; FEX.DAT;
+CDb = 1; 55; No; /mnt/disk/ltd/55; MED.DAT; FEX.DAT;
+;CDb = 1; 60; No; /mnt/disk/ltd/60; ACC.DAT; USR.DAT; LST.DAT; MED.DAT;
+;CDb = 1; 65; No; /mnt/disk/ltd/65; ACC.DAT; USR.DAT; LST.DAT; MED.DAT;
+;CDb = 1; 15; No; j:\15; reg;
+;
+;

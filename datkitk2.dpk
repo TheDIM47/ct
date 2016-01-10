@@ -1,6 +1,7 @@
 package datkitk2;
 
-{$R datkit.res}
+{$R *.res}
+{$R 'datkit.res'}
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
@@ -22,10 +23,11 @@ package datkitk2;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$DESCRIPTION 'Clarion Toolkit'}
 {$IMPLICITBUILD OFF}
 
 requires
-  baseclx,
+  rtl,
   visualclx;
 
 contains

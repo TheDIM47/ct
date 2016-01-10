@@ -1,7 +1,7 @@
 (*
 ** Clarion DAT table to dBASE DBF packet converter 
 ** Copyright (C) by Dmitry Koudryavtsev    
-** http://juliasoft.chat.ru
+** http://juliasoft.nm.ru
 ** juliasoft@mail.ru
 **
 ** DBF UNIT

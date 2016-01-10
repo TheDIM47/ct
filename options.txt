@@ -55,7 +55,7 @@ Properties
   AppendMode - boolean 
   ----------
     If destination table exists, converted records will be appended,
-    overwhise new table will be created.
+    overwhise new table will be (re-)created.
 
     Note: Be careful in shared environment !
 
@@ -72,8 +72,9 @@ Properties
     array elementh (<array>[1]) will be converted using appropriate
     field type.
 
-  OemConvert - Boolean 
+  OemConvert - TOemCvtType
   ----------
     Strings, containing international characters will be converted
-    using standard Windows procedure OemToCharBuff (from DOS to
-    current Windows locale)
+    using standard Windows procedures: 
+      OemToCharBuff or CharToOemBuff  (see MSDN for details)
+

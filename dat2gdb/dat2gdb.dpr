@@ -1,16 +1,19 @@
 (*
 ** CLARION TO INTERBASE GDB CONVERTER
 ** Copyright (C) by Dmitry Koudryavtsev
-** Under GNU Public License
+** GNU Public License
 *)
-Program DAT2GDB;
+Program dat2gdb;
 {$APPTYPE CONSOLE}
 
 {$IFDEF LINUX}
-{$INCLUDE ../d2dx.inc}
+{$I ../d2dx.inc}
 {$ELSE}
-{$INCLUDE ..\d2dx.inc}
+{$I ..\d2dx.inc}
+{$I dat2gdb.inc}
 {$ENDIF}
+
+{$H+}
 
 uses
 {$IFDEF LINUX}
@@ -20,7 +23,13 @@ uses
   Windows,
 {$ENDIF}
   sparser, incinfo, DB, SysUtils, Classes,
-  IBDatabase, IB, IBSQL, IBQuery, IBTable, IBDatabaseInfo, IBHeader,
+  IBDatabase,
+  IB,
+  IBSQL,
+//  IBQuery,
+//  IBTable,
+  IBDatabaseInfo,
+  IBHeader,
   cldb, clarion
 {$IFDEF VER140}
 {$IFDEF USE_VARIANT}
@@ -128,6 +137,8 @@ begin
   repeat
     err := 0;
     try
+      ATable.Read_Only := True;
+      ATable.Exclusive := False;
       ATable.Open;
     except
       if ep then begin
@@ -174,8 +185,9 @@ Var
 
   T1 : TDateTime;
   S, SNames : String;
-  XS : array [0..255] of String;
+  XS : array [0..255] of ShortString;
   XD : array [0..255] of Double;
+  XB : array [0..255] of Word;
   N : Longint;
   IbFldNo, i : Byte;
   f_idx : integer;
@@ -188,22 +200,24 @@ Var
 begin
   T1 := Now;
   CDbTableName := CheckSlash(ACDb.CDbPath) + CheckExt(ACDb.CDbTables[ATIdx]);
+
   IBTableName := UpperCase(RemoveExt(ACDb.CDbTables[ATIdx]));
   WriteLn('CVT: CDB:', ACDb.CDBID, ' FROM:', CDbTableName, ' TO:', IbTableName);
 
   FDateFields := []; FTimeFields := [];
 
-  // Query
-//  IQuery := TIBQuery.Create(Nil);
   IQuery := TIBSQL.Create(Nil);
   ITrans := TIBTransaction.Create(Nil);
 
   IQuery.Database := ADb;
   IQuery.Transaction := ITrans;
   ITrans.DefaultDatabase := ADb;
+  ITrans.DefaultAction := taCommit; { 1.15.2 }
 
   // Clarion Table
   CtTable := TCtClarion.Create(Nil);
+  CtTable.Read_Only := True;
+  CtTable.Exclusive := False;
   CtTable.FileName := CDbTableName;
 
   // Clarion Open
@@ -245,7 +259,7 @@ begin
   // Clarion Cursor Open
   CtCur := TCtCursor.Create(CtTable, 32767, coFastForw);
 
-  if NOT ACDb.CDbInc then begin
+  if (NOT ACDb.CDbInc) OR DeleteOld then begin
     IQuery.SQL.Clear;
     S := 'DELETE FROM ' + IbTableName +
          ' WHERE (OFFID=' + IntToStr(ACDb.OFFID) +
@@ -346,93 +360,180 @@ begin
             IQuery.Params[IbFldNo].AsDateTime := 0
           else
             IQuery.Params[IbFldNo].AsDateTime := CtCur.GetDate(CtTable.Fields[i]);
-        end else
-          if TimeSupport AND (i in FTimeFields) then begin
-            IQuery.Params[IbFldNo].AsDateTime := CtCur.GetTime(CtTable.Fields[i])
-          end else
-            if CtTable.Fields[i].IsArray then begin
-              if ArrayAsStr then begin
-                /// 1.14
-                XS[i] := CtCur.GetArrayAsString(CtTable.Fields[i]);
-                ///
-                IQuery.Params[IbFldNo].Data^.sqltype := SQL_TEXT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
-                IQuery.Params[IbFldNo].Data^.sqllen := Length(XS[i]);
-                IQuery.Params[IbFldNo].Data^.sqldata := PChar(@XS[i][1]);
-                IQuery.Params[IbFldNo].Modified := True;
-              end else begin
-                IQuery.Params[IbFldNo].Data^.sqltype := SQL_TEXT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
-                IQuery.Params[IbFldNo].Data^.sqllen := 0;
-                IQuery.Params[IbFldNo].Modified := True;
+          Inc(IbFldNo);
+          continue;
+        end;
+
+        if TimeSupport AND (i in FTimeFields) then begin
+          IQuery.Params[IbFldNo].AsDateTime := CtCur.GetTime(CtTable.Fields[i]);
+          Inc(IbFldNo);
+          continue;
+        end;
+
+        if CtTable.Fields[i].IsArray then begin
+          if ArrayAsStr then begin
+            /// 1.14
+            XS[i] := CtCur.GetArrayAsString(CtTable.Fields[i]);
+            {$IFDEF IBX6XX}
+            IQuery.Params[IbFldNo].Data.sqltype := SQL_TEXT or (IQuery.Params[IbFldNo].Data.sqltype and 1);
+            IQuery.Params[IbFldNo].Data.sqllen := Length(XS[i]);
+            IQuery.Params[IbFldNo].Data.sqldata := PChar(@XS[i][1]);
+            {$ELSE}
+            IQuery.Params[IbFldNo].Data^.sqltype := SQL_TEXT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
+            IQuery.Params[IbFldNo].Data^.sqllen := Length(XS[i]);
+            IQuery.Params[IbFldNo].Data^.sqldata := PChar(@XS[i][1]);
+            {$ENDIF}
+            IQuery.Params[IbFldNo].Modified := True;
+          end else begin
+            {$IFDEF IBX6XX}
+            IQuery.Params[IbFldNo].Data.sqltype := SQL_TEXT or (IQuery.Params[IbFldNo].Data.sqltype and 1);
+            IQuery.Params[IbFldNo].Data.sqllen := 0;
+            {$ELSE}
+            IQuery.Params[IbFldNo].Data^.sqltype := SQL_TEXT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
+            IQuery.Params[IbFldNo].Data^.sqllen := 0;
+            {$ENDIF}
+            IQuery.Params[IbFldNo].Modified := True;
+          end;
+          Inc(IbFldNo);
+          continue;
+        end;
+
+        case CtTable.Fields[i].GetFieldType of
+          FLD_BYTE:
+            begin
+              XB[i] := 0; XB[i] := CtCur.GetByte(CtTable.Fields[i]);
+              {$IFDEF IBX6XX}
+              PByte(IQuery.Params[IbFldNo].Data.sqldata)^ := XB[i];
+              IQuery.Params[IbFldNo].Data.sqltype := SQL_SHORT or (IQuery.Params[IbFldNo].Data.sqltype and 1);
+              IQuery.Params[IbFldNo].Data.sqllen := 2;
+              {$ELSE}
+              PByte(IQuery.Params[IbFldNo].Data^.sqldata)^ := XB[i];
+              IQuery.Params[IbFldNo].Data^.sqltype := SQL_SHORT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
+              IQuery.Params[IbFldNo].Data^.sqllen := 2;
+              {$ENDIF}
+//              P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
+//              PByte(IQuery.Params[IbFldNo].Data^.sqldata)^ := XB[i];
+              IQuery.Params[IbFldNo].Modified := True;
+            end;
+          FLD_SHORT:
+            begin
+              {$IFDEF IBX6XX}
+              IQuery.Params[IbFldNo].Data.sqltype := SQL_SHORT or (IQuery.Params[IbFldNo].Data.sqltype and 1);
+              IQuery.Params[IbFldNo].Data.sqllen := 2;
+              P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
+              IQuery.Params[IbFldNo].Data.sqldata := P;
+              {$ELSE}
+              IQuery.Params[IbFldNo].Data^.sqltype := SQL_SHORT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
+              IQuery.Params[IbFldNo].Data^.sqllen := 2;
+              P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
+              IQuery.Params[IbFldNo].Data^.sqldata := P;
+              {$ENDIF}
+              IQuery.Params[IbFldNo].Modified := True;
+            end;
+          FLD_LONG:
+            begin
+              {$IFDEF IBX6XX}
+              IQuery.Params[IbFldNo].Data.sqltype := SQL_LONG or (IQuery.Params[IbFldNo].Data.sqltype and 1);
+              IQuery.Params[IbFldNo].Data.sqllen := 4;
+              P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
+              IQuery.Params[IbFldNo].Data.sqldata := P;
+              {$ELSE}
+              IQuery.Params[IbFldNo].Data^.sqltype := SQL_LONG or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
+              IQuery.Params[IbFldNo].Data^.sqllen := 4;
+              P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
+              IQuery.Params[IbFldNo].Data^.sqldata := P;
+              {$ENDIF}
+              IQuery.Params[IbFldNo].Modified := True;
+            end;
+          FLD_PICTURE,
+          FLD_STRING:
+            begin
+              {$IFDEF IBX6XX}
+              IQuery.Params[IbFldNo].Data.sqltype := SQL_TEXT or (IQuery.Params[IbFldNo].Data.sqltype and 1);
+              P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
+              IQuery.Params[IbFldNo].Data.sqllen := CtTable.Fields[i].GetFieldSize;
+              {$ELSE}
+              IQuery.Params[IbFldNo].Data^.sqltype := SQL_TEXT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
+              P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
+              IQuery.Params[IbFldNo].Data^.sqllen := CtTable.Fields[i].GetFieldSize;
+              {$ENDIF}
+              // right-trim
+              {$IFDEF IBX6XX}
+              while (IQuery.Params[IbFldNo].Data.sqllen > 0) and
+                    (P[IQuery.Params[IbFldNo].Data.sqllen-1] = #$20) do
+                IQuery.Params[IbFldNo].Data.sqllen := IQuery.Params[IbFldNo].Data.sqllen - 1;
+              if IQuery.Params[IbFldNo].Data.sqllen > 0 then begin
+              {$ELSE}
+              while (IQuery.Params[IbFldNo].Data^.sqllen > 0) and
+                    (P[IQuery.Params[IbFldNo].Data^.sqllen-1] = #$20) do
+                Dec(IQuery.Params[IbFldNo].Data^.sqllen);
+              if IQuery.Params[IbFldNo].Data^.sqllen > 0 then begin
+              {$ENDIF}
+              //
+                {$IFDEF LINUX}
+                {$IFDEF IBX6XX}
+                x := IQuery.Params[IbFldNo].Data.sqllen; y := x;
+                {$ELSE}
+                x := IQuery.Params[IbFldNo].Data^.sqllen; y := x;
+                {$ENDIF}
+                ip1 := p; ip2 := p;
+                case iconv(IcvtID, ip1, x, ip2, y) of
+                  E2BIG  : WriteLn('Iconv - Destination buffer too small');
+                  EILSEQ : WriteLn('Iconv - Illegal sequence');
+                  EINVAL : WriteLn('Iconv - Invalid input sequence');
+                end;
+                {$ENDIF}
+                {$IFDEF WIN32}
+                OemToCharBuff(P, P, IQuery.Params[IbFldNo].Data^.sqllen);
+                {$ENDIF}
+                {$IFDEF IBX6XX}
+                IQuery.Params[IbFldNo].Data.sqldata := P;
+                {$ELSE}
+                IQuery.Params[IbFldNo].Data^.sqldata := P;
+                {$ENDIF}
               end;
-            end else
-              case CtTable.Fields[i].GetFieldType of
-                FLD_BYTE:
-                  begin
-                    IQuery.Params[IbFldNo].Data^.sqltype := SQL_SHORT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
-                    IQuery.Params[IbFldNo].Data^.sqllen := 1;
-                    P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
-                    IQuery.Params[IbFldNo].Data^.sqldata := P;
-                    IQuery.Params[IbFldNo].Modified := True;
-                  end;
-                FLD_SHORT:
-                  begin
-                    IQuery.Params[IbFldNo].Data^.sqltype := SQL_SHORT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
-                    IQuery.Params[IbFldNo].Data^.sqllen := 2;
-                    P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
-                    IQuery.Params[IbFldNo].Data^.sqldata := P;
-                    IQuery.Params[IbFldNo].Modified := True;
-                  end;
-                FLD_LONG:
-                  begin
-                    IQuery.Params[IbFldNo].Data^.sqltype := SQL_LONG or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
-                    IQuery.Params[IbFldNo].Data^.sqllen := 4;
-                    P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
-                    IQuery.Params[IbFldNo].Data^.sqldata := P;
-                    IQuery.Params[IbFldNo].Modified := True;
-                  end;
-                FLD_PICTURE,
-                FLD_STRING:
-                  begin
-                    IQuery.Params[IbFldNo].Data^.sqltype := SQL_TEXT or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
-                    P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
-                    IQuery.Params[IbFldNo].Data^.sqllen := CtTable.Fields[i].GetFieldSize;
-                    {$IFDEF LINUX}
-                    x := IQuery.Params[IbFldNo].Data^.sqllen; y := x;
-                    ip1 := p; ip2 := p;
-                    case iconv(IcvtID, ip1, x, ip2, y) of
-                      E2BIG  : WriteLn('Iconv - Destination buffer too small');
-                      EILSEQ : WriteLn('Iconv - Illegal sequence');
-                      EINVAL : WriteLn('Iconv - Invalid input sequence');
-                    end;
-                    {$ENDIF}
-                    {$IFDEF WIN32}
-                    OemToCharBuff(P, P, IQuery.Params[IbFldNo].Data^.sqllen);
-                    {$ENDIF}
-                    IQuery.Params[IbFldNo].Data^.sqldata := P;
-                    IQuery.Params[IbFldNo].Modified := True;
-                  end;
-                FLD_DECIMAL:
-                  begin
-                    //
-                    // XD[i]tMem(IQuery.Params[IbFldNo].Data^.sqldata, SizeOf(Double));
-                    //
-                    XD[i] := CtCur.GetDecimal(CtTable.Fields[i]);
-                    PDouble(IQuery.Params[IbFldNo].Data^.sqldata)^ := XD[i];
-                    IQuery.Params[IbFldNo].Data^.sqltype := SQL_DOUBLE or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
-                    IQuery.Params[IbFldNo].Data^.sqllen := SizeOf(Double);
-                    IQuery.Params[IbFldNo].Data^.sqlscale := 0;
-                    IQuery.Params[IbFldNo].Modified := True;
-                  end;
-                FLD_REAL:
-                  begin
-                    IQuery.Params[IbFldNo].Data^.sqltype := SQL_DOUBLE or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
-                    IQuery.Params[IbFldNo].Data^.sqllen := SizeOf(Double);
-                    P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
-                    IQuery.Params[IbFldNo].Data^.sqlscale := 0;
-                    IQuery.Params[IbFldNo].Data^.sqldata := P;
-                    IQuery.Params[IbFldNo].Modified := True;
-                  end;
-              end; // case
+              IQuery.Params[IbFldNo].Modified := True;
+            end;
+          FLD_DECIMAL:
+            begin
+              // XD[i]tMem(IQuery.Params[IbFldNo].Data^.sqldata, SizeOf(Double));
+              XD[i] := CtCur.GetDecimal(CtTable.Fields[i]);
+              {$IFDEF IBX6XX}
+              PDouble(IQuery.Params[IbFldNo].Data.sqldata)^ := XD[i];
+              IQuery.Params[IbFldNo].Data.sqltype := SQL_DOUBLE or (IQuery.Params[IbFldNo].Data.sqltype and 1);
+              IQuery.Params[IbFldNo].Data.sqllen := SizeOf(Double);
+              IQuery.Params[IbFldNo].Data.sqlscale := 0;
+              {$ELSE}
+              PDouble(IQuery.Params[IbFldNo].Data^.sqldata)^ := XD[i];
+              IQuery.Params[IbFldNo].Data^.sqltype := SQL_DOUBLE or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
+              IQuery.Params[IbFldNo].Data^.sqllen := SizeOf(Double);
+              IQuery.Params[IbFldNo].Data^.sqlscale := 0;
+              {$ENDIF}
+              IQuery.Params[IbFldNo].Modified := True;
+            end;
+          FLD_REAL:
+            begin
+              {$IFDEF IBX6XX}
+              IQuery.Params[IbFldNo].Data.sqltype := SQL_DOUBLE or (IQuery.Params[IbFldNo].Data.sqltype and 1);
+              IQuery.Params[IbFldNo].Data.sqllen := SizeOf(Double);
+              P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
+              IQuery.Params[IbFldNo].Data.sqlscale := 0;
+              IQuery.Params[IbFldNo].Data.sqldata := P;
+              {$ELSE}
+              IQuery.Params[IbFldNo].Data^.sqltype := SQL_DOUBLE or (IQuery.Params[IbFldNo].Data^.sqltype and 1);
+              IQuery.Params[IbFldNo].Data^.sqllen := SizeOf(Double);
+              P := CtCur.GetRawDataPointer(CtTable.Fields[i]);
+              IQuery.Params[IbFldNo].Data^.sqlscale := 0;
+              IQuery.Params[IbFldNo].Data^.sqldata := P;
+              {$ENDIF}
+              IQuery.Params[IbFldNo].Modified := True;
+            end;
+          else
+            begin
+              IQuery.Params[IbFldNo].Clear;
+              IQuery.Params[IbFldNo].IsNull := True;
+            end;
+        end; // case
         Inc(IbFldNo);
       end; // if <> FLD_GROUP
     end; // for
@@ -449,13 +550,18 @@ begin
     end;
     Inc(N);
     CtCur.GotoNext;
-    Sleep(0);
+    {$IFDEF WIN32}
+      {$IFDEF TIME_SLICE}
+        Sleep(0);
+      {$ENDIF}
+    {$ENDIF}
     if (N mod CommitAfter) = 0 then begin
       Write(N, #13);
       ITrans.CommitRetaining;
     end; // if CommitAfter
   end; // while
 
+  ITrans.CommitRetaining; { 1.15.2 }
   ITrans.Commit;
   WriteLn(N);
 
@@ -486,6 +592,7 @@ Var
   CDbCount,
   TblCount : Byte;
   T1, T2 : TDateTime;
+  n : integer;
 
 BEGIN
   WriteLn('DAT2GDB Clarion to Interbase GDB packet converter v' + TOOLKIT_VERSION);
@@ -505,6 +612,7 @@ BEGIN
   IDb := TIBDatabase.Create(Nil);
   IDb.SqlDialect := 3;
   IDbTrans := TIBTransaction.Create(Nil);
+  IDbTrans.DefaultAction := taCommit;
 
   IDbTrans.DefaultDatabase := IDb;
   IDb.DefaultTransaction := IDbTrans;
@@ -536,7 +644,15 @@ BEGIN
       exit;
     end;
     {$ENDIF}
-    for CDb_i := 0 to CDbCount - 1 do begin
+    for CDb_i := 0 to CDbCount - 1 do begin // 1.15.3
+      n := 0;
+      while n < PCDbDatabase(CDbDb[CDb_i])^.CDbTables.Count do begin
+        if PCDbDatabase(CDbDb[CDb_i])^.CDbTables[n] = '' then begin
+          PCDbDatabase(CDbDb[CDb_i])^.CDbTables.Delete(n);
+          continue;
+        end;
+        inc(n);
+      end; // while
       TblCount := PCDbDatabase(CDbDb[CDb_i])^.CDbTables.Count;
       Write('D2G: CDb:', PCDbDatabase(CDbDb[CDb_i])^.CDBID);
       if PCDbDatabase(CDbDb[CDb_i])^.CDbInc then

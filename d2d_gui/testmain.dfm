@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 346
-  Top = 154
+  Left = 350
+  Top = 173
   Width = 438
   Height = 305
   HorzScrollBar.Range = 423
@@ -8,18 +8,20 @@ object Form1: TForm1
   ActiveControl = eSource
   AutoScroll = False
   Caption = 'D2D GUI Edition'
-  Color = clButton
-  Font.Color = clText
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
   Font.Height = 11
   Font.Name = 'MS Sans Serif'
   Font.Pitch = fpVariable
   Font.Style = []
-  ParentFont = False
+  OldCreateOrder = True
   Position = poDesktopCenter
   Scaled = False
   OnClose = FormClose
   OnCreate = FormCreate
-  PixelsPerInch = 75
+  PixelsPerInch = 96
+  TextHeight = 13
   object SpeedButton1: TSpeedButton
     Left = 400
     Top = 40
@@ -39,25 +41,25 @@ object Form1: TForm1
   object Bevel1: TBevel
     Left = 0
     Top = 32
-    Width = 438
+    Width = 430
     Height = 2
     Align = alTop
   end
   object Bevel2: TBevel
     Left = 0
-    Top = 256
-    Width = 438
+    Top = 229
+    Width = 430
     Height = 2
     Align = alBottom
   end
   object Label1: TLabel
     Left = 8
     Top = 44
-    Width = 89
-    Height = 15
+    Width = 66
+    Height = 12
     Caption = 'Source DAT file'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
@@ -67,11 +69,11 @@ object Form1: TForm1
   object Label2: TLabel
     Left = 8
     Top = 68
-    Width = 84
-    Height = 15
+    Width = 64
+    Height = 12
     Caption = 'Target DBF file'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
@@ -82,10 +84,10 @@ object Form1: TForm1
     Left = 104
     Top = 40
     Width = 297
-    Height = 23
+    Height = 20
     Hint = 'You can use relative paths'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
@@ -100,10 +102,10 @@ object Form1: TForm1
     Left = 104
     Top = 64
     Width = 297
-    Height = 23
+    Height = 20
     Hint = 'You can use relative paths'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
@@ -117,18 +119,18 @@ object Form1: TForm1
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 438
+    Width = 430
     Height = 32
     Align = alTop
     Alignment = taLeftJustify
     BevelOuter = bvNone
     Color = clWhite
+    Font.Charset = DEFAULT_CHARSET
     Font.Color = clNavy
     Font.Height = 19
     Font.Name = 'MS Sans Serif'
     Font.Pitch = fpVariable
     Font.Style = [fsBold]
-    ParentColor = False
     ParentFont = False
     TabOrder = 2
     object Image1: TImage
@@ -138,7 +140,7 @@ object Form1: TForm1
       Height = 32
       Align = alLeft
       Picture.Data = {
-        07544269746D61703A080000424D360800000000000036040000280000002000
+        07544269746D617036080000424D360800000000000036040000280000002000
         0000200000000100080000000000000400000000000000000000000100000000
         000000000000000080000080000000808000800000008000800080800000C0C0
         C000C0DCC000F0CAA6000020400000206000002080000020A0000020C0000020
@@ -211,9 +213,10 @@ object Form1: TForm1
     object Label3: TLabel
       Left = 40
       Top = 4
-      Width = 266
-      Height = 23
+      Width = 205
+      Height = 16
       Caption = 'Juliasoft Dat to Dbf converter '
+      Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = 19
       Font.Name = 'MS Sans Serif'
@@ -224,8 +227,8 @@ object Form1: TForm1
   end
   object Panel2: TPanel
     Left = 0
-    Top = 258
-    Width = 438
+    Top = 231
+    Width = 430
     Height = 47
     Align = alBottom
     BevelOuter = bvNone
@@ -233,9 +236,10 @@ object Form1: TForm1
     object Label6: TLabel
       Left = 8
       Top = 8
-      Width = 108
+      Width = 109
       Height = 13
       Caption = 'mailto: juliasoft@mail.ru'
+      Font.Charset = DEFAULT_CHARSET
       Font.Color = clMaroon
       Font.Height = 11
       Font.Name = 'MS Sans Serif'
@@ -251,8 +255,8 @@ object Form1: TForm1
       Caption = 'Convert It !'
       Default = True
       Enabled = False
-      Font.CharSet = fcsUnicode
-      Font.Color = clText
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
       Font.Height = 13
       Font.Name = 'Arial'
       Font.Pitch = fpVariable
@@ -261,7 +265,7 @@ object Form1: TForm1
       TabOrder = 0
       OnClick = btnGoClick
       Glyph.Data = {
-        7A010000424D7601000000000000760000002800000020000000100000000100
+        76010000424D7601000000000000760000002800000020000000100000000100
         04000000000000010000120B0000120B00001000000000000000000000000000
         800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
         FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333000000000
@@ -282,8 +286,8 @@ object Form1: TForm1
     Width = 105
     Height = 17
     Caption = 'Append Mode'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
@@ -297,8 +301,8 @@ object Form1: TForm1
     Width = 105
     Height = 17
     Caption = 'Date Support'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
@@ -312,8 +316,8 @@ object Form1: TForm1
     Width = 105
     Height = 17
     Caption = 'Undelete'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
@@ -327,8 +331,8 @@ object Form1: TForm1
     Width = 105
     Height = 17
     Caption = 'Array Support'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
@@ -342,8 +346,8 @@ object Form1: TForm1
     Width = 105
     Height = 17
     Caption = 'Repeatable'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
@@ -351,43 +355,28 @@ object Form1: TForm1
     ParentFont = False
     TabOrder = 8
   end
-  object cbOemConvert: TCheckBox
-    Left = 280
-    Top = 120
-    Width = 105
-    Height = 17
-    Caption = 'OEM Convert'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
-    Font.Height = 12
-    Font.Name = 'Arial'
-    Font.Pitch = fpVariable
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 9
-  end
   object GroupBox1: TGroupBox
     Left = 8
     Top = 144
     Width = 409
     Height = 73
     Caption = 'Date Fields'
-    Font.CharSet = fcsUnicode
-    Font.Color = clText
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
     Font.Height = 12
     Font.Name = 'Arial'
     Font.Pitch = fpVariable
     Font.Style = []
     ParentFont = False
-    TabOrder = 10
+    TabOrder = 9
     object Label4: TLabel
       Left = 8
       Top = 20
-      Width = 95
-      Height = 15
+      Width = 71
+      Height = 12
       Caption = 'should  contains:'
-      Font.CharSet = fcsUnicode
-      Font.Color = clText
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
       Font.Height = 12
       Font.Name = 'Arial'
       Font.Pitch = fpVariable
@@ -397,11 +386,11 @@ object Form1: TForm1
     object Label5: TLabel
       Left = 8
       Top = 44
-      Width = 125
-      Height = 15
+      Width = 94
+      Height = 12
       Caption = 'should be started with:'
-      Font.CharSet = fcsUnicode
-      Font.Color = clText
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
       Font.Height = 12
       Font.Name = 'Arial'
       Font.Pitch = fpVariable
@@ -412,7 +401,7 @@ object Form1: TForm1
       Left = 112
       Top = 16
       Width = 289
-      Height = 23
+      Height = 20
       Hint = 'strings should be delimited by ";"'
       ParentShowHint = False
       ShowHint = True
@@ -422,12 +411,25 @@ object Form1: TForm1
       Left = 144
       Top = 40
       Width = 257
-      Height = 23
+      Height = 20
       Hint = 'strings should be delimited by ";"'
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
     end
+  end
+  object OemBox: TComboBox
+    Left = 280
+    Top = 120
+    Width = 113
+    Height = 21
+    ItemHeight = 13
+    TabOrder = 10
+    Text = 'None'
+    Items.Strings = (
+      'None'
+      'OemToChar'
+      'CharToOem')
   end
   object OpenDialog1: TOpenDialog
     Title = 'Open'

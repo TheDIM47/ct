@@ -95,6 +95,12 @@ Undelete    = No         - Convert records marked as "deleted"
 ArrayAsStr  = Yes        - Convert array to string VARCHAR(xxx)
                            otherwise empty string VARCHAR(1) (for speed)
 
+DeleteOld   = Yes        - Delete old records with current CDb and OffID 
+                           before converting new records
+                           ("delete from <table_name> where 
+                             (cdbid=<CDb>) and (offid=<OffId>)")
+                           Useful for empty (only metadata) gdb files.
+
 WaitFor     = 1000       - Wait for the next try to open source file
                            default: INFINITE
 
@@ -150,5 +156,5 @@ Any comments and suggestions are welcome
 ----------------------------------------
 Dmitry Koudryavtsev
 RUSSIA, Volgograd, 1999-2002
-Web:    http://juliasoft.chat.ru
+Web:    http://juliasoft.nm.ru
 E-Mail: juliasoft@mail.ru

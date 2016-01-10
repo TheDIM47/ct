@@ -1,13 +1,13 @@
 (*
 ** CLARION 2.X TOOLKIT
 ** Copyright (C) by Dmitry Koudryavtsev
-** http://juliasoft.chat.ru
+** http://juliasoft.nm.ru
 ** juliasoft@mail.ru
 *)
 Program Convert;
 {$APPTYPE CONSOLE}
 {$A-$X+}
-Uses DB, ClDB, Clarion, DBTables, SysUtils, Classes;
+Uses DB, ClDB, Clarion, DBTables, SysUtils, Classes, Variants;
 
 type
   PDateRec = ^TDateRec;
@@ -73,7 +73,7 @@ Var
   arrI, elmLen : Integer;
   pwdID : Word;
 // 1.12
-Const
+Var
   GroupOffset : Integer = 0;
 //  C1, C2 : Byte;
 //  FldLen : Integer;

@@ -56,8 +56,8 @@ type
     procedure Set_DateContains(const Value: WideString); safecall;
     function Get_DateStarted: WideString; safecall;
     procedure Set_DateStarted(const Value: WideString); safecall;
-    function Get_OemConvert: WordBool; safecall;
-    procedure Set_OemConvert(Value: WordBool); safecall;
+    function Get_OemConvert: TOemCvtType; safecall;
+    procedure Set_OemConvert(Value: TOemCvtType); safecall;
   end;
 
 implementation
@@ -254,7 +254,6 @@ begin
   FDelphiControl.SetSubComponent(IsSubComponent);
 end;
 
-
 function TD2DAX.Get_DateContains: WideString;
 begin
   Result := FDelphiControl.DateContains;
@@ -275,12 +274,12 @@ begin
   FDelphiControl.DateStarted := Value;
 end;
 
-function TD2DAX.Get_OemConvert: WordBool;
+function TD2DAX.Get_OemConvert: TOemCvtType;
 begin
   Result := FDelphiControl.OemConvert;
 end;
 
-procedure TD2DAX.Set_OemConvert(Value: WordBool);
+procedure TD2DAX.Set_OemConvert(Value: TOemCvtType);
 begin
   FDelphiControl.OemConvert := Value;
 end;

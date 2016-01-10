@@ -1,7 +1,7 @@
 (*
 ** CLARION 2.1 TOOLKIT
 ** Copyright (C) by Dmitry Koudryavtsev
-** http://juliasoft.chat.ru
+** http://juliasoft.nm.ru
 ** juliasoft@mail.ru
 *)
 

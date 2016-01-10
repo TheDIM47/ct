@@ -1,4 +1,4 @@
-CREATE DATABASE "d:\ibabc.gdb"
+CREATE DATABASE "/opt/interbase/ibabc.gdb"
 USER "SYSDBA" PASSWORD "masterkey"
 PAGE_SIZE 4096
 DEFAULT CHARACTER SET WIN1251;

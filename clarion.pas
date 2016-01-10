@@ -1,13 +1,13 @@
 (*
 ** CLARION 2.1 TOOLKIT
 ** Copyright (C) by Dmitry Koudryavtsev
-** http://juliasoft.chat.ru
+** http://juliasoft.nm.ru
 ** juliasoft@mail.ru
 *)
 unit clarion;
 {$H-}
 interface
-{$INCLUDE d2dx.inc}
+{$I d2dx.inc}
 uses SysUtils, Classes, cldb
 {$IFDEF VER140}
 {$IFDEF USE_VARIANT}
@@ -25,13 +25,13 @@ const
   REC_HEADER_SIZE = SizeOf(TDataHeader); { for Record    }
   DELTA_DAYS      = 36161;               { for fast DATE conversion }
 
-  TOOLKIT_VERSION = '1.14';
+  TOOLKIT_VERSION = '1.16';
 
   ERR_TRN_WAIT = 'Try to wait owned transaction';
   ERR_TRN_DIR  = 'Invalid Transaction Directory';
   ERR_CT_CANT_OPEN_FILE  = 'Can`t open file or access denied';
   ERR_CT_INVALID_FLDNAME = 'Invalid Field Name';
-  ERR_CT_INVALID_VERSION = 'Invalid file version';
+  ERR_CT_INVALID_VERSION = 'Invalid file version or format';
   ERR_CT_STRANGE_ENCRYPT = 'Strange header encryption algorythm';
 
 // type EClarionError = class(Exception);
@@ -100,6 +100,7 @@ type
     procedure Open; virtual;
     function IsLocked : Boolean;
     function IsEncrypted : Boolean;
+    function IsOwned : Boolean;
     function IsMemoExist : Boolean;
     function GetField(Index : Integer) : TctField;
     function GetArray(Index : Integer) : TctArray;
@@ -1198,7 +1199,9 @@ end;
 
 procedure TctClarion.ReadHeader;
 begin
+  {$I-}
   FileRead( FFile, FHeader, sizeof(THeader) );
+  {$I+}
 end;
 
 procedure TctClarion.ReadFields;
@@ -1209,7 +1212,7 @@ begin
   for i := 1 to FHeader.NumFlds do begin
     Fld := TctField.Create(Self);
     FileRead( FFile, Fld.FFieldRecord, sizeof(TFieldRecord) );
-    if IsEncrypted then DecodeBuffer(Fld.FFieldRecord, sizeof(TFieldRecord), FId);
+    if IsEncrypted or IsOwned then DecodeBuffer(Fld.FFieldRecord, sizeof(TFieldRecord), FId);
     FFields.Add( Fld );
   end;
 end;
@@ -1223,11 +1226,11 @@ begin
   for i := 1 to FHeader.NumKeys do begin
     Key := TctKey.Create(Self);
     FileRead( FFile, Key.FKeyRecord, sizeof(TKeyRecord) );
-    if IsEncrypted then DecodeBuffer(Key.FKeyRecord, sizeof(TKeyRecord), FId);
+    if IsEncrypted or IsOwned then DecodeBuffer(Key.FKeyRecord, sizeof(TKeyRecord), FId);
     for j := 1 to Key.FKeyRecord.NumComps do begin
       GetMem( KeyItem, sizeof(TKeyItem) );
       FileRead( FFile, KeyItem^, sizeof(TKeyItem) );
-      if IsEncrypted then DecodeBuffer(KeyItem^, sizeof(TKeyItem), FId);
+      if IsEncrypted or IsOwned then DecodeBuffer(KeyItem^, sizeof(TKeyItem), FId);
       Key.FKeyItems.Add( KeyItem );
     end;
     FKeys.Add( Key );
@@ -1242,7 +1245,7 @@ begin
   for i := 1 to FHeader.NumPics do begin
     Pic := TctPicture.Create(Self);
     FileRead( FFile, Pic.FPictureRecord, sizeof(TPictureRecord) );
-    if IsEncrypted then DecodeBuffer(Pic.FPictureRecord, sizeof(TPictureRecord), FId);
+    if IsEncrypted or IsOwned then DecodeBuffer(Pic.FPictureRecord, sizeof(TPictureRecord), FId);
     FPictures.Add( Pic );
   end;
 end;
@@ -1292,6 +1295,11 @@ begin
   Result := Boolean( FHeader.SFAtr AND SIGN_ENCRYPTED );
 end;
 
+function TctClarion.IsOwned : Boolean;
+begin
+  Result := Boolean( FHeader.SFAtr AND SIGN_OWNED );
+end;
+
 function TctClarion.IsMemoExist : Boolean;
 begin
   Result := Boolean( FHeader.SFAtr AND SIGN_MEMO );
@@ -1318,10 +1326,13 @@ procedure TctClarion.Open;
    end else begin // no memo
      FId := Swap( FHeader.MemoLen );
      if NOT CheckHeader( FId ) then begin
-       FId := Swap( PWordArray(@FHeader.MemName)[5] XOR $2020 );
+       FId := Swap( FHeader.Offset SHR 16 );
        if NOT CheckHeader(FId) then begin
-         Close;
-         raise Exception.Create( ERR_CT_STRANGE_ENCRYPT );
+         FId := Swap( PWordArray(@FHeader.MemName)[5] XOR $2020 );
+         if NOT CheckHeader(FId) then begin
+           Close;
+           raise Exception.Create( ERR_CT_STRANGE_ENCRYPT );
+         end;
        end;
      end; // MemoLen
    end; // isMemoExist - IsEncrypted
@@ -1335,28 +1346,34 @@ begin
   FPictures := TList.Create;
   FArrays := TList.Create;
 
+  if FRead_Only then FMode := fmOpenRead else FMode := fmOpenReadWrite;
+  if FExclusive then FMode := FMode OR fmShareExclusive else FMode := FMode OR fmShareDenyNone;
   {$I-}
   FFile := FileOpen( FFileName, FMode );
   {$I+}
-  if FFile > 0 then begin
+  if FFile < 1 then
+    raise Exception.Create( ERR_CT_CANT_OPEN_FILE )
+  else begin
     FActive := True;
     ReadHeader;
     if FHeader.FileSIG <> VERSION_21_SIG then begin
-      Close;
+      FileClose(FFile);
+      FActive := False;
       raise Exception.Create( ERR_CT_INVALID_VERSION );
     end;
-    if IsEncrypted then begin
+    if IsEncrypted or IsOwned then begin
       if FId <> 0 then begin
         if NOT CheckHeader(FId) then Crack
       end else
         Crack;
     end;
-    ReadFields;
-    ReadKeys;
-    ReadPictures;
-    ReadArrays;
-  end else
-    raise Exception.Create( ERR_CT_CANT_OPEN_FILE );// file opened
+    if FActive then begin
+      ReadFields;
+      ReadKeys;
+      ReadPictures;
+      ReadArrays;
+    end;
+  end;
 end;
 
 procedure TctClarion.Close;

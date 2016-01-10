@@ -39,7 +39,6 @@ type
     cbUndelete: TCheckBox;
     cbArraySupport: TCheckBox;
     cbRepeatable: TCheckBox;
-    cbOemConvert: TCheckBox;
     GroupBox1: TGroupBox;
     Label4: TLabel;
     eContains: TEdit;
@@ -47,6 +46,7 @@ type
     eStarted: TEdit;
     Image1: TImage;
     Label6: TLabel;
+    OemBox: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnGoClick(Sender: TObject);
@@ -70,14 +70,26 @@ Uses SysUtils;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  DAX := TD2DX.Create(Self);
+{$IFDEF WIN32}
+  {$IFDEF D2D_OCX}
+    DAX := TD2DX.Create(Nil);
+  {$ELSE}
+    DAX := TD2DX.Create;
+  {$ENDIF}
+{$ELSE}
+  DAX := TD2DX.Create;
+{$ENDIF}
   with DAX do begin
     cbAppendMode.Checked := AppendMode;
     cbDateSupport.Checked := DateSupport;
     cbArraySupport.Checked := ArraySupport;
     cbUndelete.Checked := UnDelMode;
     cbRepeatable.Checked := Repeatable;
-    cbOemConvert.Checked := OemConvert;
+    case OemConvert of
+      ocNone      : OemBox.ItemIndex := 0;
+      ocOemToChar : OemBox.ItemIndex := 1;
+      ocCharToOem : OemBox.ItemIndex := 2;
+    end;
   end;
   OpenDialog1.InitialDir := ExtractFileDir(ParamStr(0));
 end;
@@ -95,7 +107,12 @@ begin
     ArraySupport := cbArraySupport.Checked;
     UnDelMode := cbUndelete.Checked;
     Repeatable := cbRepeatable.Checked;
-    OemConvert := cbOemConvert.Checked;
+    case OemBox.ItemIndex of
+      0 : OemConvert := ocNone;      //: OemBox.ItemIndex := 0;
+      1 : OemConvert := ocOemToChar; //: OemBox.ItemIndex := 1;
+      2 : OemConvert := ocCharToOem; //: OemBox.ItemIndex := 2;
+    end;
+    //OemConvert := OemConvert.Checked;
     //
     DateContains := eContains.Text; // !!!!!!!!
     DateStarted  := eStarted.Text;  // !!!!!!!!

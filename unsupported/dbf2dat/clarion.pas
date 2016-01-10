@@ -1,7 +1,7 @@
 (*
 ** CLARION 2.X TOOLKIT
 ** Copyright (C) by Dmitry Koudryavtsev
-** http://juliasoft.chat.ru
+** http://juliasoft.nm.ru
 ** juliasoft@mail.ru
 **
 ** THIS UNIT ONLY FOR DBF->DAT CONVERTER
@@ -240,7 +240,7 @@ procedure DoubleToBCD(Const Fld: TCtField; Const Dbl : Double; Buffer : PChar);
 
 implementation
 
-Uses FileCtrl, Windows;
+Uses FileCtrl, Windows, Variants;
 
 procedure Register;
 begin

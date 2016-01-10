@@ -2,7 +2,7 @@ unit dvmain;
 
 interface
 
-{$H-}{$IFDEF VER140}{$J+}{$ENDIF}
+{$H+}{$IFDEF VER140}{$J+}{$ENDIF}
 {$IFDEF LINUX}
 {$INCLUDE ../d2dx.inc}
 {$ELSE}
